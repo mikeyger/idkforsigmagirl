@@ -221,3 +221,72 @@ document.addEventListener('keyup', (e) => {
 });
 
 gameLoop();
+
+
+// Replace keyboard event listeners with touch event listeners
+document.addEventListener('touchstart', handleTouchStart, false);
+document.addEventListener('touchmove', handleTouchMove, false);
+
+// Define touch event handlers
+let touchX = null;
+let touchY = null;
+
+function handleTouchStart(event) {
+    touchX = event.touches[0].clientX;
+    touchY = event.touches[0].clientY;
+}
+
+function handleTouchMove(event) {
+    event.preventDefault();
+    if (!touchX || !touchY) {
+        return;
+    }
+
+    const x = event.touches[0].clientX;
+    const y = event.touches[0].clientY;
+
+    const deltaX = x - touchX;
+    const deltaY = y - touchY;
+
+    if (Math.abs(deltaX) > Math.abs(deltaY)) {
+        if (deltaX > 0) {
+            keys['ArrowRight'] = true;
+            keys['ArrowLeft'] = false;
+        } else {
+            keys['ArrowLeft'] = true;
+            keys['ArrowRight'] = false;
+        }
+    } else {
+        if (deltaY > 0) {
+            keys['ArrowDown'] = true;
+            keys['ArrowUp'] = false;
+        } else {
+            keys['ArrowUp'] = true;
+            keys['ArrowDown'] = false;
+        }
+    }
+}
+
+// Adjust canvas size based on device pixel ratio
+const scaleFactor = window.devicePixelRatio;
+canvas.width = window.innerWidth * scaleFactor;
+canvas.height = window.innerHeight * scaleFactor;
+canvas.style.width = `${window.innerWidth}px`;
+canvas.style.height = `${window.innerHeight}px`;
+
+// Scale context to account for device pixel ratio
+ctx.scale(scaleFactor, scaleFactor);
+
+// Adjust player speed and bullet speed for mobile
+player.speed = 3;
+player.bullets.forEach(bullet => bullet.speed = 5);
+
+// Update movePlayer() function to handle touch controls
+
+function movePlayer() {
+    if (keys['ArrowLeft'] && player.x > 0) player.x -= player.speed;
+    if (keys['ArrowRight'] && player.x < canvas.width - player.width) player.x += player.speed;
+    if (keys['ArrowUp'] && player.y > 0) player.y -= player.speed;
+    if (keys['ArrowDown'] && player.y < canvas.height - player.height) player.y += player.speed;
+}
+
